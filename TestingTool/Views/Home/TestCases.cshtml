@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "Test Cases";
+}
+
+<body onload="GetApplications()">
+    <div>
+        <h1>Test Cases</h1>
+        <p>This is where we will be doing the test case stuffs.</p>
+        <input id="Button1" type="button" value="Call API" runat="server" onclick="CalcTheValue()" />
+        <input id="Button2" type="button" value="AddALongAndShort" runat="server" onclick="window.location.href('@Url.Action("LevelDetails","TestLevels")')" />
+        <input id="Button2" type="button" value="LOLOLLOL" runat="server" onclick="LevelDetails(document.getElementById('ApplicationV').value)" />
+
+        <input type="text" id="numValu">
+        <select id="ApplicationV" runat="server" onchange="SetApplication(this.value)"></select>
+
+        <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+
+
+
+        <script>
+        function loadDoc() {
+            $.ajax({
+                url: 'http://localhost:26228/api/TestCase',
+                type: 'GET',
+                //  data: "name=John",
+                success: function (response) {
+                    alert(response);
+                },
+                error: function (error) {
+                    alert(error.statusText);
+
+                }
+            });
+        };
+        function CalcTheValue() {
+            var dc = $(document.getElementById('numValu')).val();
+                $.ajax({
+                    url: 'http://localhost:26228/api/TestCase',
+                    type: 'GET',
+                    data: { id: dc},
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (error) {
+                        alert(error.statusText);
+
+                    }
+                });
+        };
+        function GetApplications() {
+            $.ajax({
+                url: 'http://localhost:26228/api/TestCase/GetApplications',
+                type: 'GET',
+                success: function (json) {
+                    var ss = JSON.parse(json);
+                    var D = ss.applications;
+
+                    $.each(D, function (key, value) {
+                        $(document.getElementById('ApplicationV')).append($('<option/>',
+                            {
+                                value: value.id,
+                                text: value.Name
+                            }));
+                    })
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                }
+            });
+        };
+        function LongAndShort() {
+            $.fancybox({
+                'href': 'http://www.google.com',
+                'type': 'iframe'
+            });
+
+        };
+
+        function SetApplication() {
+
+            var _applicationName = $(document.getElementById('ApplicationV')).val();
+            //$.ajax({
+            //    url: 'http://localhost:26228/api/TestCase',
+            //    type: 'GET',
+            //    data: { id: dc },
+            //    success: function (response) {
+            //        alert(response);
+            //    },
+            //    error: function (error) {
+            //        alert(error.statusText);
+
+            //    }
+            //});
+        };
+        function LevelDetails(val) {
+            window.location.href = "/TestLevels/LevelDetails?parentID=" + val;
+            @*string LLL = '@Url.Action("LevelDetails","", new { parentID = val })';
+            window.location.href();*@
+        };
+        </script>
+    </div>
+</body>

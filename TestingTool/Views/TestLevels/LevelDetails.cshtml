@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+
+    //  Guid ParentID = new Guid(ViewBag.parentID);
+
+}
+@{ string guid = @ViewBag.parentID;}
+@{ TestingTool.Models.TestLevels.TestStructures parentLevel = new TestingTool.Models.TestLevels.TestStructures(); }
+
+<body onload="try2()">
+    <div id="breadCrum"></div>
+    <div id="lab" style="visibility:hidden">@ViewBag.parentID</div>
+
+    <h2 id="ParentName"></h2>
+    <table id="table_children" class="children" style="width:100% ; border:1px solid black">
+        <tr style=" border:1px solid black">
+            <th style="width:25%">ID</th>
+            <th style="width:25%">Name</th>
+            <th style="width:25%">Short Name</th>
+            <th style="width:25%">Action</th>
+
+        </tr>
+    </table>
+    <br><br><br>
+
+
+    <table>
+        <tr>
+            <td>Name:</td>
+            <td><input type="text" placeholder="Name" id="tb_new_name"></td>
+        </tr>
+        <tr>
+            <td>Short Name:</td>
+            <td><input type="text" placeholder="Short Name" id="tb_new_short_name"></td>
+        </tr>
+    </table>
+
+    <br><br><br>
+    <input type="button" value="Add New Child" onclick="AddNewChild()">
+</body>
+<script>
+
+    function try2() {
+        var dc = $(document.getElementById('lab')).text();
+        var ur = "http://localhost:26228/api/TestStructures?parent_ID=";
+        $.ajax({
+            url: ur + dc,
+            type: 'GET',
+
+            success: function (response) {
+                var ss = JSON.parse(response);
+                var D = ss.structures;
+                document.getElementById("ParentName").innerHTML = "Children of " + D.Name;
+                ShowChildren(D.id);
+                CreateBreadCrumbs(D.id);
+            },
+            error: function (error) {
+                alert(url);
+                alert(error.statusText);
+
+            }
+        });
+    };
+    function LevelDetails(val) {
+            window.location.href = "/TestLevels/LevelDetails?parentID=" + val;
+    };
+    function test(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+    };
+    function testDetails(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        window.location.href = "/Tests/TestCaseDetails?Structure_IDNumber=" + id;
+    };
+    function test2() {
+        $(this).addClass('selected').siblings().removeClass('selected');
+        var value = $(this).find('td:first').html();
+        alert(value);
+    }
+    function ShowChildren(ParentID)
+    {
+        var dc = $(document.getElementById('lab')).text();
+        var ur = "http://localhost:26228/api/TestStructures/Levels?parent_ID=";
+        var table = document.getElementById("table_children");
+
+        $("table.children tbody tr td").remove();
+        $("table.children tbody tr div").remove();
+
+        $.ajax({
+            url: ur + ParentID,
+            type: 'GET',
+
+            success: function (response) {
+
+                var ss = JSON.parse(response);
+                var D = ss.structures;
+
+                $.each(D, function (key, value) {
+                    var row = table.insertRow();
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    cell1.innerHTML = value.id;
+                    cell2.innerHTML = value.Name;
+                    cell3.innerHTML = value.ShortName;
+                    cell4.outerHTML = '<div><input type="button" value="Edit" onclick="test(this)"><input type="button" value="Test Cases" onclick="testDetails(this)"><input type="button" value="Delete" onclick="test(this)"></div>'
+                })
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
+    };
+    function CreateBreadCrumbs(ParentID) {
+        var dc = $(document.getElementById('lab')).text();
+        var ur = "http://localhost:26228/api/TestStructures/Hiarchy?self_ID=";
+        var div = document.getElementById("breadCrum");
+
+        $.ajax({
+            url: ur + ParentID,
+            type: 'GET',
+
+            success: function (response) {
+                var ss = JSON.parse(response);
+                var D = ss.structures;
+                $.each(D.reverse(), function (key, value) {
+                    var aS = document.createElement('a');
+                    aS.text = value.Name + '  >  ';
+                    aS.gg = value.id.toString();
+                    aS.href = '/TestLevels/LevelDetails?parentID=' + value.id.toString(); +';'
+
+                    div.appendChild(aS);
+                })
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
+    };
+    function AddNewChild() {
+        var ur = "http://localhost:26228/api/TestStructures/Levels?username=kconners";
+        var NewChild = {
+            Name: $(document.getElementById('tb_new_name')).val(),
+            ShortName: $(document.getElementById('tb_new_short_name')).val(),
+            Status: 1,
+            Parent_IDNumber: $(document.getElementById('lab')).text()
+        }
+        $.ajax({
+            url: ur,
+            type: 'Post',
+            data: JSON.stringify(NewChild),
+            contentType: 'application/json',
+
+            success: function (response) {
+                ShowChildren(NewChild.Parent_IDNumber);
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
+    };
+</script>

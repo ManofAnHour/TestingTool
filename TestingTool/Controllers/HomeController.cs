@@ -26,5 +26,11 @@ namespace TestingTool.Controllers
 
             return View();
         }
+        public ActionResult TestCases()
+        {
+            ViewBag.Message = "Test Cases.";
+
+            return View();
+        }
     }
 }
