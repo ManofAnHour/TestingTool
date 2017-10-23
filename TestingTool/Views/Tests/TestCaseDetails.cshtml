@@ -6,7 +6,11 @@
 @{ Guid StructureID = @ViewBag.Structure_IDNumber;}
 
 <h2>TestCaseDetails</h2>
-
+<style>
+    input {
+        max-width: 440px;
+    }
+</style>
 <div>
     <h4>TestCase</h4>
     <h4>StructureID</h4>
@@ -20,29 +24,204 @@
     @Html.ActionLink("Back to List", "Index")
 </p>
 <body onload="ShowTests()">
+    <div id="tc_idNum" style="visibility:hidden">LOL</div>
     <table class="tests" id="table_tests">
         <tr style=" border:1px solid black">
             <th style="width:25%">ID</th>
             <th style="width:25%">Title</th>
-            <th style="width:25%">Description</th>
+            <th style="width:25%">Test Case</th>
             <th style="width:25%">Action</th>
         </tr>
     </table>
     <div>
         
-        <table>
+        <table style="border:1px solid black; width:100%">
             <tr>
-                <td>Title: <input type="text"></td>
-                <td>Description: <input type="text"></td>
+                <td style="width:50%"><label  style="width:40%">Title:</label><input  style="width:60%" type="text" id="tb_title" readonly="readonly"></td>
+                <td style="width:50%"><label  style="width:40%">Test Case:</label><input style="width:60%"  type="text"  id="tb_testcase"></td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><label style="width:40%">Description:</label><input type="text" style="width:60%"  id="tb_description"></td>
+                <td style="width:50%"><label style="width:40%">Condition:</label><input type="text" style="width:60%"  id="tb_condition"></td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><label style="width:40%">Test Type:</label><input type="text" id="tb_test_type" style="width:60%"></td>
+                <td style="width:50%"><label style="width:40%">Use Case:</label><input type="text" id="tb_use_case" style="width:60%"></td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><label style="width:40%">PRD:</label><input type="text" id="tb_prd" style="width:60%"></td>
+                <td style="width:50%"><label style="width:40%">Requirement ID:</label><input type="text" id="tb_requirement_id" style="width:60%"></td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><label style="width:40%">Iteration:</label><input type="text" id="tb_itereation" style="width:60%"></td>
+                <td style="width:50%"><label style="width:40%">Module:</label><input type="text" id="tb_module" style="width:60%"></td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><label style="width:40%">Feature:</label><input type="text" id="tb_feature" style="width:60%"></td>
+                <td style="width:50%"><label style="width:40%">Feature Type:</label><input type="text" id="tb_feature_type" style="width:60%"></td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><label style="width:40%">Assigned To:</label><input type="text" id="tb_assigned_to" style="width:60%"></td>
+                <td style="width:50%"><label style="width:40%">Notes:</label><input type="text" id="tb_notes" style="width:60%"></td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><label style="width:40%">Automated ?:</label><input type="text" id="tb_auto_y_n" style="width:60%"></td>
+                <td style="width:50%"><label style="width:40%">Automation Test Status:</label><input type="text" id="tb_auto_test_status" style="width:60%"></td>
+            </tr>
+            <tr>
+                <td style="width:50%"><label style="width:40%">Automation Script Name:</label><input type="text" id="tb_auto_script_name" style="width:60%" ></td>
+                <td style="width:50%"><label style="width:40%">Regression Test ?:</label><input type="text" id="tb_regression_y_n" style="width:60%"></td>
             </tr>
 </table>
+
+        <input id="bt_update_tc" type="button" onclick="UpdateTestCase()" style="visibility:hidden" disabled value="Edit Test Case">
 </div>
+    <input id="bt_AddNewStep" type="button" onclick="AddNewTestStep()" value="Add Test Case Step">
+    <div style="overflow-y: scroll; width:100%; height: 300px">
+    
+        <table id="table_steps" class="test_steps" style="border:1px solid black;  width:100%;">
+            <tr style="border:1px solid black; width:100%; max-height:25px">
+                <th style="width:1px"></th>
+                <th style="width:10px">Step #</th>
+                <th style="width:40%">Step</th>
+                <th style="width:40%">Expected Result</th>
+                <th style="width:20px">Actions</th>
+            </tr>
+</table>
+       
+</div>
+    <input id="bt_UpdateSteps" type="button" onclick="UpdateSteps()" value="Update Test Case Step">
 </body>
 <script>
-    function test(e) {
+    function details(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        var ur = "http://localhost:26228/api/TestCases?id=";
+        $.ajax({
+            url: ur + id,
+            type: 'GET',
+
+            success: function (response) {
+                var ss = JSON.parse(response);
+                var D = ss.testcases;
+                $.each(D, function (key, value) {
+                    LoadDetails(value);
+                    LoadSteps(value.id);
+                })
+            },
+            error: function (error) {
+                alert(url);
+                alert(error.statusText);
+            }
+        });
+
+        
+      //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+    };
+    function AddNewStep() {
         var id = $(e).closest("tr").find('td:eq(0)').text();
         alert(id);
-      //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+       
+    };
+
+
+    function UpdateTestStep(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        alert(id);
+        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+    };
+
+    function deleteTestStep(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        alert(id);
+        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+    };
+
+    function UpdateSteps() {
+        var table = document.getElementById("table_steps");
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            if (i != 0) {
+
+                try {
+                    var ts = {
+                        Test_case_id: document.getElementById("tc_idNum").innerHTML,
+                        Id: document.getElementById("table_steps").rows[i].cells[0].textContent,
+                        Status: 1,
+                        Step: document.getElementById("table_steps").rows[i].cells[2].querySelector('input').value,
+                        Expected_result: document.getElementById("table_steps").rows[i].cells[3].querySelector('input').value,
+                        Step_num: i.toString()
+                    }
+                    
+                    var ur = "http://localhost:26228/api/TestCases/TestCase/" + ts.Test_case_id + "/TestSteps?username=kconners";
+
+                    $.ajax({
+                        url: ur,
+                        type: 'Put',
+                        data: JSON.stringify(ts),
+                        contentType: 'application/json',
+
+
+                        success: function () {
+                           
+                        },
+                        error: function (error) {
+                            alert(error.statusText);
+
+                        }
+                    });
+                    throw 'mYException';
+                }
+                catch(e)
+                {
+                    alert(e.statusText);
+                }
+            }
+        }
+        LoadSteps(document.getElementById("tc_idNum").innerHTML);
+    };
+    function LoadDetails(TC) {
+    
+        document.getElementById("tb_title").value = TC.test_case_title;
+        document.getElementById("tb_testcase").value = TC.test_case;
+
+        document.getElementById("tb_description").value = TC.test_case_description;
+        document.getElementById("tb_condition").value = TC.test_condition;
+
+        document.getElementById("tb_test_type").value = TC.testtype;
+        document.getElementById("tb_use_case").value = TC.use_case;
+
+        document.getElementById("tb_prd").value = TC.prd;
+        document.getElementById("tb_requirement_id").value = TC.requirement_id;
+
+        document.getElementById("tb_itereation").value = TC.iteration;
+        document.getElementById("tb_module").value = TC.module;
+
+        document.getElementById("tb_feature").value = TC.feature;
+        document.getElementById("tb_feature_type").value = TC.feature_type;
+
+        document.getElementById("tb_assigned_to").value = TC.assigned_to;
+        document.getElementById("tb_notes").value = TC.notes;
+
+        document.getElementById("tb_auto_y_n").value = TC.automated_yes_no;
+        document.getElementById("tb_auto_test_status").value = TC.automation_test_status;
+
+        document.getElementById("tb_auto_script_name").value = TC.automation_script_name;
+        document.getElementById("tb_regression_y_n").value = TC.regression_yes_no;
+
+        document.getElementById("tc_idNum").innerHTML = TC.id;
+        document.getElementById("bt_update_tc").style.visibility = "visible";
+        document.getElementById("bt_update_tc").removeAttribute("disabled");
+    };
+    function edit(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        alert(id);
+        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
     };
     function ShowTests() {
         var dc = $(document.getElementById('lab')).text();
@@ -69,9 +248,147 @@
                     var cell4 = row.insertCell(3);
                     cell1.innerHTML = value.id;
                     cell2.innerHTML = value.test_case_title;
-                    cell3.innerHTML = value.test_case_description;
-                    cell4.outerHTML = '<div><input type="button" value="Edit" onclick="test(this)"></div>'
+                    cell3.innerHTML = value.test_case;
+                    cell4.outerHTML = '<div><input type="button" value="Details" onclick="details(this)"><input type="button" value="Edit" onclick="edit(this)"></div>'
                 })
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
+    };
+    function UpdateTestCase() {
+
+        var dc = $(document.getElementById('tc_idNum')).text();
+        
+        var ur = "http://localhost:26228/api/TestCases?id=";
+        $.ajax({
+            url: ur + dc,
+            type: 'GET',
+
+            success: function (response) {
+                
+                var ss = JSON.parse(response);
+                var D = ss.testcases;
+
+                $.each(D, function (key, value) {
+                    Fill(value);
+                })
+
+                
+                
+            },
+            error: function (error) {
+                alert(url);
+                alert(error.statusText);
+            }
+        });
+
+        
+    };
+    function AddNewTestStep() {
+        
+        var ts = {
+            Test_case_id: document.getElementById("tc_idNum").innerHTML,
+            Id: '00000000-0000-0000-0000-000000000000',
+            Status: 1,
+            Step: "",
+            Exprected_result: ""
+        }
+
+        var ur = "http://localhost:26228/api/TestCases/TestCase/" + ts.Test_case_id + "/TestSteps?username=kconners";
+
+        $.ajax({
+            url: ur,
+            type: 'Post',
+            data: JSON.stringify(ts),
+            contentType: 'application/json',
+
+
+            success: function (response) {
+                LoadSteps(ts.Test_case_id);
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
+    };
+    function LoadSteps(testCaseID) {
+        
+        var ur = "http://localhost:26228/api/TestCases/TestCase/" + testCaseID + "/TestSteps";
+        var table = document.getElementById("table_steps");
+
+        $("table.test_steps tbody tr td").remove();
+        $("table.test_steps tbody tr div").remove();
+
+        $.ajax({
+            url: ur,
+            type: 'GET',
+
+            success: function (response) {
+
+                var ss = JSON.parse(response);
+                var D = ss.teststeps;
+
+                $.each(D, function (key, value) {
+                    var row = table.insertRow();
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    cell1.outerHTML = '<tr style="width:1px"><td style="visibility:hidden; width:1px"><div style="visibility:hidden; width:1px;  max-height:25px">'+value.Id+'</div></td></tr>';
+                    cell2.innerHTML = value.Step_num;
+                    cell3.outerHTML = '<tr><td><div><input style="width:440px" type="text" id="tb_step" value = \"' + value.Step + '"></div></td></tr>';
+                    cell4.outerHTML = '<tr><td><div><input style="width:440px" id = "tb_ER" type="text" value =\"' + value.Expected_result.toString() + '"></div></td></tr>';
+                    cell5.outerHTML = '<tr><td><div><input type="button" value="Edit" onclick="UpdateTestStep(this)"><input type="button" value="Delete" onclick="deleteTestStep(this)"></div></td></tr>'
+                })
+            },
+            error: function (error) {
+                alert(error.statusText);
+            }
+        });
+    };
+    function Fill(tc) {
+            tc.test_case = document.getElementById("tb_testcase").value;
+            tc.test_case_description = document.getElementById("tb_description").value;
+            tc.test_condition = document.getElementById("tb_condition").value;
+
+            tc.testtype = document.getElementById("tb_test_type").value;
+            tc.use_case = document.getElementById("tb_use_case").value;
+
+            tc.prd = document.getElementById("tb_prd").value;
+            tc.requirement_id = document.getElementById("tb_requirement_id").value;
+
+            tc.iteration = document.getElementById("tb_itereation").value;
+            tc.module = document.getElementById("tb_module").value;
+
+            tc.feature = document.getElementById("tb_feature").value;
+            tc.feature_type = document.getElementById("tb_feature_type").value;
+
+            tc.assigned_to = document.getElementById("tb_assigned_to").value;
+            tc.notes = document.getElementById("tb_notes").value;
+
+            tc.automated_yes_no = document.getElementById("tb_auto_y_n").value;
+            tc.automation_test_status = 0;
+
+            tc.automation_script_name = document.getElementById("tb_auto_script_name").value;
+            tc.regression_yes_no = document.getElementById("tb_regression_y_n").value;
+        
+
+        var ur = "http://localhost:26228/api/TestCases/TestCase?username=kconners";
+        alert(JSON.stringify(tc));
+        $.ajax({
+            url: ur,
+            type: 'Put',
+            data: JSON.stringify(tc),
+            contentType: 'application/json',
+
+
+            success: function (response) {
+                alert(response);
             },
             error: function (error) {
                 alert(error.statusText);

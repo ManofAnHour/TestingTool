@@ -50,5 +50,16 @@ namespace TestingTool.Models
             public DateTime updated_date;
             public int status;
         }
+
+        public class Test_step
+        {
+            public Guid Test_case_id { get; set; }
+            public Guid Id { get; set; }
+            public string Step { get; set; }
+            public string Expected_result{ get; set; }
+
+            public int Step_num = 0;
+            public int Status = 0;
+        }
     }
 }

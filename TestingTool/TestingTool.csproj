@@ -175,7 +175,6 @@
     </Compile>
     <Compile Include="Models\TestCase.cs" />
     <Compile Include="Models\TestLevels.cs" />
-    <Compile Include="Models\TestStep.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
