@@ -32,5 +32,11 @@ namespace TestingTool.Controllers
 
             return View();
         }
+        public ActionResult TestSet()
+        {
+            ViewBag.Message = "Test Sets.";
+
+            return View("~/Views/TestSets/TestSet.cshtml");
+        }
     }
 }

@@ -163,18 +163,21 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="conFIG.cs" />
     <Compile Include="Controllers\APIControllers\TestCasesController.cs" />
+    <Compile Include="Controllers\APIControllers\TestSetController.cs" />
     <Compile Include="Controllers\APIControllers\TestStructuresController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Pages\TestsController.cs" />
     <Compile Include="Controllers\TestCaseController.cs" />
     <Compile Include="Controllers\TestLevelsController.cs" />
     <Compile Include="DataAccess\testCaseData.cs" />
+    <Compile Include="DataAccess\testSetData.cs" />
     <Compile Include="DataAccess\testStructureData.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\TestCase.cs" />
     <Compile Include="Models\TestLevels.cs" />
+    <Compile Include="Models\TestSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -217,6 +220,7 @@
     <Content Include="Views\Home\TestCases.cshtml" />
     <Content Include="Views\TestLevels\LevelDetails.cshtml" />
     <Content Include="Views\Tests\TestCaseDetails.cshtml" />
+    <Content Include="Views\TestSets\TestSet.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
