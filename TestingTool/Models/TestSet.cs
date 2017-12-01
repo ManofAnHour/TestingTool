@@ -16,6 +16,11 @@ namespace TestingTool.Models
             public int Status = 0;
         }
 
+        public class Test_Sets
+        {
+            public List<Models.TestSet.Test_Set> testsets { get; set; }
+        }
+
         public class Test_Mapping
         {
             public Guid Id { get; set; }

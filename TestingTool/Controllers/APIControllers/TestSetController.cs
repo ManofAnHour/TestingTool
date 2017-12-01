@@ -38,6 +38,37 @@ namespace TestingTool.Controllers.APIControllers
             return H;
         }
 
+
+        
+        [HttpGet]
+        public HttpResponseMessage GetTestSet([FromUri]string TestSetName)
+        {
+            HttpResponseMessage H = new HttpResponseMessage();
+
+            DataAccess.testSetData data = new DataAccess.testSetData();
+            List<TestSet.Test_Set> list = new List<TestSet.Test_Set>();
+            string parameter = "testset_title";
+            string query = @"select * from qadata.ref_testset where " + parameter + @" = @EqualsWhat";
+            
+            list = data.GetTestSet(query, "Varchar", TestSetName);
+
+            var collection = list;
+
+            dynamic collectionWrapper = new
+            {
+                testsets = collection
+            };
+
+            var output = JsonConvert.SerializeObject(collectionWrapper);
+
+            JsonSerializerSettings JSS = new JsonSerializerSettings();
+
+            H.Content = new StringContent(output);
+            H.StatusCode = HttpStatusCode.OK;
+
+            return H;
+        }
+
         // GET: api/TestSet/5
         [Route("{id}")]
         [HttpGet]
@@ -66,7 +97,34 @@ namespace TestingTool.Controllers.APIControllers
             return H;
         }
 
-        
+        [Route("{id}/Mappings")]
+        [HttpGet]
+        public HttpResponseMessage GetTestSetMappings(Guid id)
+        {
+            HttpResponseMessage H = new HttpResponseMessage();
+
+            DataAccess.testSetData data = new DataAccess.testSetData();
+            List<TestSet.Test_Mapping> list = new List<TestSet.Test_Mapping>();
+            list = data.GetTestSetsCases(id);
+
+            var collection = list;
+
+            dynamic collectionWrapper = new
+            {
+                testcases = collection
+            };
+
+            var output = JsonConvert.SerializeObject(collectionWrapper);
+
+            JsonSerializerSettings JSS = new JsonSerializerSettings();
+
+            H.Content = new StringContent(output);
+            H.StatusCode = HttpStatusCode.OK;
+
+            return H;
+        }
+
+
         [HttpPost]
         public HttpResponseMessage AddTestSet([FromBody]TestSet.Test_Set item, [FromUri]string username)
         {

@@ -16,7 +16,7 @@ namespace TestingTool
         //public static string ConnFor_PG_Admin = "Server=10.45.71.39;Port= 5432; Username=postgres;Password=[Ds#$Kk.;Database=BFC";
 
 
-
+        public static string testingTool = "http://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + Convert.ToString(System.Web.HttpContext.Current.Request.Url.Port) + "/";
 
 
     }

@@ -162,6 +162,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="conFIG.cs" />
+    <Compile Include="Controllers\APIControllers\AutomationController.cs" />
     <Compile Include="Controllers\APIControllers\TestCasesController.cs" />
     <Compile Include="Controllers\APIControllers\TestSetController.cs" />
     <Compile Include="Controllers\APIControllers\TestStructuresController.cs" />
@@ -169,12 +170,14 @@
     <Compile Include="Controllers\Pages\TestsController.cs" />
     <Compile Include="Controllers\TestCaseController.cs" />
     <Compile Include="Controllers\TestLevelsController.cs" />
+    <Compile Include="DataAccess\automationData.cs" />
     <Compile Include="DataAccess\testCaseData.cs" />
     <Compile Include="DataAccess\testSetData.cs" />
     <Compile Include="DataAccess\testStructureData.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Automation.cs" />
     <Compile Include="Models\TestCase.cs" />
     <Compile Include="Models\TestLevels.cs" />
     <Compile Include="Models\TestSet.cs" />

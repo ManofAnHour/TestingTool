@@ -42,6 +42,39 @@ namespace TestingTool.DataAccess
 
             return list;
         }
+        public List<Models.TestSet.Test_Set> GetTestSet(string Query, string DataTpe, string EqualsWhat)
+        {
+            List<Models.TestSet.Test_Set> list = new List<Models.TestSet.Test_Set>();
+
+            con = new NpgsqlConnection(conFIG.ConnFor_PG_Admin);
+            cmd = new NpgsqlCommand(@Query, con);
+            if (DataTpe == "Uuid")
+            { cmd.Parameters.Add("@EqualsWhat", NpgsqlTypes.NpgsqlDbType.Uuid).Value = new Guid(EqualsWhat); }
+            else if (DataTpe == "Varchar")
+            { cmd.Parameters.Add("@EqualsWhat", NpgsqlTypes.NpgsqlDbType.Varchar).Value = EqualsWhat; }
+            else if (DataTpe == "Int")
+            { cmd.Parameters.Add("@EqualsWhat", NpgsqlTypes.NpgsqlDbType.Integer).Value = EqualsWhat; }
+
+            da = new NpgsqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+
+
+            foreach (DataRow DR in ds.Tables[0].Rows)
+            {
+                Models.TestSet.Test_Set item = new Models.TestSet.Test_Set
+                {
+                    Id = new Guid(Convert.ToString(DR["row_idnumber"])),
+                    Title = Convert.ToString(DR["testset_title"]),
+                    Description = Convert.ToString(DR["testset_description"]),
+                    testset_id = Convert.ToInt32(DR["testset_id"]),
+                    Status = Convert.ToInt32(DR["status"])
+                };
+                list.Add(item);
+            }
+
+            return list;
+        }
 
         public Guid Maintain_TestSet(Models.TestSet.Test_Set item, string username)
         {
@@ -119,7 +152,7 @@ namespace TestingTool.DataAccess
             List<Models.TestSet.Test_Mapping> list = new List<Models.TestSet.Test_Mapping>();
 
             con = new NpgsqlConnection(conFIG.ConnFor_PG_Admin);
-            cmd = new NpgsqlCommand(@"SELECT MAPP.*, tc.test_case_title FROM qadata.testset_case_mapping MAPP join qadata.testcasemain tc on MAPP.test_idnum = tc.row_idnum where MAPP.testset_idnum = @TestSet_IDNUM and status >= 1  order by order_number;", con);
+            cmd = new NpgsqlCommand(@"SELECT MAPP.*, tc.test_case_title FROM qadata.testset_case_mapping MAPP join qadata.testcasemain tc on MAPP.test_idnum = tc.row_idnum where MAPP.testset_idnum = @TestSet_IDNUM and MAPP.status >= 1  order by order_number;", con);
             cmd.Parameters.Add("@TestSet_IDNUM", NpgsqlTypes.NpgsqlDbType.Uuid).Value = TestSet_IDNUM;
             
             da = new NpgsqlDataAdapter(cmd);
