@@ -139,6 +139,22 @@ namespace TestingTool.Controllers.APIControllers
             return H;
         }
 
+        [Route("TestCase/TestSteps/{teststep_id}")]
+        [HttpDelete]
+        public HttpResponseMessage DeleteTestStep(Guid teststep_id, [FromUri]string username)
+        {
+            HttpResponseMessage H = new HttpResponseMessage();
+            Models.TestCase.Test_step item = new TestCase.Test_step { Status = -1, Id = teststep_id };
+            DataAccess.testCaseData data = new DataAccess.testCaseData();
+            Guid ID_Num = data.Maintain_TestCase_Step(item, username);
+
+            H.Content = new StringContent(Convert.ToString(ID_Num));
+            H.StatusCode = HttpStatusCode.OK;
+
+            return H;
+        }
+
+
 
 
 

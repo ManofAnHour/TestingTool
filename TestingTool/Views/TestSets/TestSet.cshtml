@@ -61,7 +61,7 @@
                     cell1.innerHTML = value.Id;
                     cell2.innerHTML = value.Title;
                     cell3.innerHTML = value.Description;
-                    cell4.outerHTML = '<div><input type="button" value="Edit" onclick="test(this)"><input type="button" value="Test Cases" onclick="testDetails(this)"><input type="button" value="Delete" onclick="test(this)"></div>'
+                    cell4.outerHTML = '<div><input type="button" value="Edit" onclick="test(this)"><input type="button" value="Test Cases" onclick="testMappings(this)"><input type="button" value="Delete" onclick="test(this)"></div>'
                 })
             },
             error: function (error) {
@@ -69,5 +69,9 @@
 
             }
         });
+    };
+    function testMappings(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        window.location.href = "/TestSets/TestSetMappings?TestSet_IDNumber=" + id;
     };
 </script>

@@ -168,6 +168,7 @@
     <Compile Include="Controllers\APIControllers\TestStructuresController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Pages\TestsController.cs" />
+    <Compile Include="Controllers\Pages\TestSetsController.cs" />
     <Compile Include="Controllers\TestCaseController.cs" />
     <Compile Include="Controllers\TestLevelsController.cs" />
     <Compile Include="DataAccess\automationData.cs" />
@@ -224,6 +225,7 @@
     <Content Include="Views\TestLevels\LevelDetails.cshtml" />
     <Content Include="Views\Tests\TestCaseDetails.cshtml" />
     <Content Include="Views\TestSets\TestSet.cshtml" />
+    <Content Include="Views\TestSets\TestSetMappings.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
