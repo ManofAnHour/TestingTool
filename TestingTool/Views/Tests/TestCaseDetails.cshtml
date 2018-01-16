@@ -201,7 +201,8 @@
                         Status: 1,
                         Step: document.getElementById("table_steps").rows[i].cells[2].querySelector('input').value,
                         Expected_result: document.getElementById("table_steps").rows[i].cells[3].querySelector('input').value,
-                        Step_num: i.toString()
+                        Step_num: document.getElementById("table_steps").rows[i].cells[1].textContent
+                        //Step_num: i.toString()
                     }
                     
                     var ur = "http://localhost:26228/api/TestCases/TestCase/" + ts.Test_case_id + "/TestSteps?username=kconners";
@@ -212,10 +213,6 @@
                         data: JSON.stringify(ts),
                         contentType: 'application/json',
 
-
-                        success: function () {
-                           
-                        },
                         error: function (error) {
                             alert(error.statusText);
 
@@ -334,11 +331,13 @@
         
     };
     function AddNewTestStep() {
+        var StepNUmber = document.getElementById('table_steps').rows.length;
         
         var ts = {
             Test_case_id: document.getElementById("tc_idNum").innerHTML,
             Id: '00000000-0000-0000-0000-000000000000',
             Status: 1,
+            Step_num: StepNUmber,
             Step: "",
             Exprected_result: ""
         }
@@ -353,6 +352,7 @@
 
 
             success: function (response) {
+              
                 LoadSteps(ts.Test_case_id);
             },
             error: function (error) {
@@ -386,7 +386,7 @@
                     var cell4 = row.insertCell(3);
                     var cell5 = row.insertCell(4);
                     cell1.outerHTML = '<tr style="width:1px"><td style="visibility:hidden; width:1px"><div style="visibility:hidden; width:1px;  max-height:25px">'+value.Id+'</div></td></tr>';
-                    cell2.innerHTML = value.Step_num;
+                    cell2.innerHTML = key+1;
                     cell3.outerHTML = '<tr><td><div><input style="width:440px" type="text" id="tb_step" value = \"' + value.Step + '"></div></td></tr>';
                     cell4.outerHTML = '<tr><td><div><input style="width:440px" id = "tb_ER" type="text" value =\"' + value.Expected_result.toString() + '"></div></td></tr>';
                     cell5.outerHTML = '<tr><td><div><input type="button" value="Edit" onclick="UpdateTestStep(this)"><input type="button" value="Delete" onclick="deleteTestStep(this)"></div></td></tr>'
