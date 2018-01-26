@@ -19,7 +19,7 @@
     <dl class="dl-horizontal">
     </dl>
 </div>
-<p>
+<p id="Link_Area">
     @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
@@ -73,7 +73,14 @@
 
             <tr>
                 <td style="width:50%"><label style="width:40%">Automated ?:</label><input type="text" id="tb_auto_y_n" style="width:60%"></td>
-                <td style="width:50%"><label style="width:40%">Automation Test Status:</label><input type="text" id="tb_auto_test_status" style="width:60%"></td>
+                <td style="width:50%"><label style="width:40%">Automation Test Status:</label>
+                <select id="dd_auto_test_status">
+                    <option value="0"></option>
+                    <option value="1">To Be Automated</option>
+                    <option value="-1">Not To be Automated</option>
+                    <option value="2">Script Complete</option>
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td style="width:50%"><label style="width:40%">Automation Script Name:</label><input type="text" id="tb_auto_script_name" style="width:60%" ></td>
@@ -100,66 +107,84 @@
     <input id="bt_UpdateSteps" type="button" onclick="UpdateSteps()" value="Update Test Case Step">
 </body>
 <script>
-    function details(e) {
-        var id = $(e).closest("tr").find('td:eq(0)').text();
-        var ur = "http://localhost:26228/api/TestCases?id=";
-        $.ajax({
-            url: ur + id,
-            type: 'GET',
-
-            success: function (response) {
-                var ss = JSON.parse(response);
-                var D = ss.testcases;
-                $.each(D, function (key, value) {
-                    LoadDetails(value);
-                    LoadSteps(value.id);
-                })
-            },
-            error: function (error) {
-                alert(url);
-                alert(error.statusText);
-            }
-        });
-
-        
-      //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
-    };
-    function Loaddetails(id) {
-        var ur = "http://localhost:26228/api/TestCases?id=";
-        $.ajax({
-            url: ur + id,
-            type: 'GET',
-
-            success: function (response) {
-                var ss = JSON.parse(response);
-                var D = ss.testcases;
-                $.each(D, function (key, value) {
-                    LoadDetails(value);
-                    LoadSteps(value.id);
-                })
-            },
-            error: function (error) {
-              
-                alert(error.statusText);
-            }
-        });
-
-
-        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
-    };
     function AddNewStep() {
         var id = $(e).closest("tr").find('td:eq(0)').text();
         alert(id);
-       
+
     };
+    function AddNewTestStep() {
+        var StepNUmber = document.getElementById('table_steps').rows.length;
+
+        var ts = {
+            Test_case_id: document.getElementById("tc_idNum").innerHTML,
+            Id: '00000000-0000-0000-0000-000000000000',
+            Status: 1,
+            Step_num: StepNUmber,
+            Step: "",
+            Exprected_result: ""
+        }
+
+        var ur = "http://localhost:26228/api/TestCases/TestCase/" + ts.Test_case_id + "/TestSteps?username=kconners";
+
+        $.ajax({
+            url: ur,
+            type: 'Post',
+            data: JSON.stringify(ts),
+            contentType: 'application/json',
 
 
-    function UpdateTestStep(e) {
-        var id = $(e).closest("tr").find('td:eq(0)').text();
-        alert(id);
-        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+            success: function (response) {
+
+                LoadSteps(ts.Test_case_id);
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
     };
+    function AddTestCase() {
+        var testcase = {
 
+            test_case: document.getElementById("tb_testcase").value,
+            structure_idnum: document.getElementById("Structure_ID").innerHTML,
+            test_case_description: document.getElementById("tb_description").value,
+            test_condition: document.getElementById("tb_condition").value,
+            testtype: document.getElementById("tb_test_type").value,
+            use_case: document.getElementById("tb_use_case").value,
+            prd: document.getElementById("tb_prd").value,
+            requirement_id: document.getElementById("tb_requirement_id").value,
+            iteration: document.getElementById("tb_itereation").value,
+            module: document.getElementById("tb_module").value,
+            feature: document.getElementById("tb_feature").value,
+            feature_type: document.getElementById("tb_feature_type").value,
+            assigned_to: document.getElementById("tb_assigned_to").value,
+            notes: document.getElementById("tb_notes").value,
+            automated_yes_no: document.getElementById("tb_auto_y_n").value,
+            automation_script_name: document.getElementById("tb_auto_script_name").value,
+            regression_yes_no: document.getElementById("tb_regression_y_n").value
+
+        }
+
+        var ur = "http://localhost:26228/api/TestCases/TestCase?username=kconners";
+
+        $.ajax({
+            url: ur,
+            type: 'Post',
+            data: JSON.stringify(testcase),
+            contentType: 'application/json',
+
+
+            success: function (response) {
+                //  alert(response);
+                Loaddetails(response);
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
+    };
     function deleteTestStep(e) {
         var id = $(e).closest("tr").find('td:eq(0)').text();
         var ts = {
@@ -188,48 +213,82 @@
             }
         });
     };
+    function details(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        var ur = "http://localhost:26228/api/TestCases?id=";
+        $.ajax({
+            url: ur + id,
+            type: 'GET',
 
-    function UpdateSteps() {
-        var table = document.getElementById("table_steps");
-        for (var i = 0, row; row = table.rows[i]; i++) {
-            if (i != 0) {
-
-                try {
-                    var ts = {
-                        Test_case_id: document.getElementById("tc_idNum").innerHTML,
-                        Id: document.getElementById("table_steps").rows[i].cells[0].textContent,
-                        Status: 1,
-                        Step: document.getElementById("table_steps").rows[i].cells[2].querySelector('input').value,
-                        Expected_result: document.getElementById("table_steps").rows[i].cells[3].querySelector('input').value,
-                        Step_num: document.getElementById("table_steps").rows[i].cells[1].textContent
-                        //Step_num: i.toString()
-                    }
-                    
-                    var ur = "http://localhost:26228/api/TestCases/TestCase/" + ts.Test_case_id + "/TestSteps?username=kconners";
-
-                    $.ajax({
-                        url: ur,
-                        type: 'Put',
-                        data: JSON.stringify(ts),
-                        contentType: 'application/json',
-
-                        error: function (error) {
-                            alert(error.statusText);
-
-                        }
-                    });
-                    throw 'mYException';
-                }
-                catch(e)
-                {
-                    alert(e.statusText);
-                }
+            success: function (response) {
+                var ss = JSON.parse(response);
+                var D = ss.testcases;
+                $.each(D, function (key, value) {
+                    LoadDetails(value);
+                    LoadSteps(value.id);
+                })
+            },
+            error: function (error) {
+                alert(url);
+                alert(error.statusText);
             }
-        }
-        LoadSteps(document.getElementById("tc_idNum").innerHTML);
+        });
+
+
+        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+    };
+    function edit(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        alert(id);
+        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+    };
+    function Fill(tc) {
+        tc.test_case = document.getElementById("tb_testcase").value;
+        tc.test_case_description = document.getElementById("tb_description").value;
+        tc.test_condition = document.getElementById("tb_condition").value;
+
+        tc.testtype = document.getElementById("tb_test_type").value;
+        tc.use_case = document.getElementById("tb_use_case").value;
+
+        tc.prd = document.getElementById("tb_prd").value;
+        tc.requirement_id = document.getElementById("tb_requirement_id").value;
+
+        tc.iteration = document.getElementById("tb_itereation").value;
+        tc.module = document.getElementById("tb_module").value;
+
+        tc.feature = document.getElementById("tb_feature").value;
+        tc.feature_type = document.getElementById("tb_feature_type").value;
+
+        tc.assigned_to = document.getElementById("tb_assigned_to").value;
+        tc.notes = document.getElementById("tb_notes").value;
+
+        tc.automated_yes_no = document.getElementById("tb_auto_y_n").value;
+        tc.automation_test_status = dd_auto_test_status.value;
+
+        tc.automation_script_name = document.getElementById("tb_auto_script_name").value;
+        tc.regression_yes_no = document.getElementById("tb_regression_y_n").value;
+
+
+        var ur = "http://localhost:26228/api/TestCases/TestCase?username=kconners";
+
+        $.ajax({
+            url: ur,
+            type: 'Put',
+            data: JSON.stringify(tc),
+            contentType: 'application/json',
+
+
+            success: function (response) {
+                // alert(response);
+            },
+            error: function (error) {
+                alert(error.statusText);
+
+            }
+        });
     };
     function LoadDetails(TC) {
-    
+
         document.getElementById("tb_title").value = TC.test_case_title;
         document.getElementById("tb_testcase").value = TC.test_case;
 
@@ -252,7 +311,11 @@
         document.getElementById("tb_notes").value = TC.notes;
 
         document.getElementById("tb_auto_y_n").value = TC.automated_yes_no;
-        document.getElementById("tb_auto_test_status").value = TC.automation_test_status;
+
+        if (TC.automation_test_status != null) {
+            document.getElementById("dd_auto_test_status").value = TC.automation_test_status;
+        }
+
 
         document.getElementById("tb_auto_script_name").value = TC.automation_script_name;
         document.getElementById("tb_regression_y_n").value = TC.regression_yes_no;
@@ -261,15 +324,77 @@
         document.getElementById("bt_update_tc").style.visibility = "visible";
         document.getElementById("bt_update_tc").removeAttribute("disabled");
     };
-    function edit(e) {
-        var id = $(e).closest("tr").find('td:eq(0)').text();
-        alert(id);
+    function Loaddetails(id) {
+        var ur = "http://localhost:26228/api/TestCases?id=";
+        $.ajax({
+            url: ur + id,
+            type: 'GET',
+
+            success: function (response) {
+                var ss = JSON.parse(response);
+                var D = ss.testcases;
+                $.each(D, function (key, value) {
+                    LoadDetails(value);
+                    LoadSteps(value.id);
+                })
+            },
+            error: function (error) {
+
+                alert(error.statusText);
+            }
+        });
+
+
         //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
+    };
+    function LoadSteps(testCaseID) {
+
+        var ur = "http://localhost:26228/api/TestCases/TestCase/" + testCaseID + "/TestSteps";
+        var table = document.getElementById("table_steps");
+
+        $("table.test_steps tbody tr td").remove();
+        $("table.test_steps tbody tr div").remove();
+
+        $.ajax({
+            url: ur,
+            type: 'GET',
+
+            success: function (response) {
+
+                var ss = JSON.parse(response);
+                var D = ss.teststeps;
+
+                $.each(D, function (key, value) {
+                    var row = table.insertRow();
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    cell1.outerHTML = '<tr style="width:1px"><td style="visibility:hidden; width:1px"><div style="visibility:hidden; width:1px;  max-height:25px">' + value.Id + '</div></td></tr>';
+                    cell2.innerHTML = key + 1;
+                    cell3.outerHTML = '<tr><td><div><input style="width:440px" type="text" id="tb_step" value = \"' + value.Step + '"></div></td></tr>';
+                    cell4.outerHTML = '<tr><td><div><input style="width:440px" id = "tb_ER" type="text" value =\"' + value.Expected_result.toString() + '"></div></td></tr>';
+                    cell5.outerHTML = '<tr><td><div><input type="button" value="Edit" onclick="UpdateTestStep(this)"><input type="button" value="Delete" onclick="deleteTestStep(this)"></div></td></tr>'
+                })
+            },
+            error: function (error) {
+                alert(error.statusText);
+            }
+        });
     };
     function ShowTests() {
         var dc = $(document.getElementById('Structure_ID')).text();
-        var ur = "http://localhost:26228/api/TestStructures/"+dc+"/Tests";
+        var ur = "http://localhost:26228/api/TestStructures/" + dc + "/Tests";
         var table = document.getElementById("table_tests");
+
+        var div = document.getElementById("Link_Area");
+
+        var aS = document.createElement('a');
+        aS.text = ' Go to teh bakz ';
+        // aS.gg = value.id.toString();
+        aS.href = '/TestLevels/LevelDetails?parentID=' + dc
+        div.appendChild(aS);
 
         $("table.tests tbody tr td").remove();
         $("table.tests tbody tr div").remove();
@@ -301,26 +426,63 @@
             }
         });
     };
+    function UpdateSteps() {
+        var table = document.getElementById("table_steps");
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            if (i != 0) {
+
+                try {
+                    var ts = {
+                        Test_case_id: document.getElementById("tc_idNum").innerHTML,
+                        Id: document.getElementById("table_steps").rows[i].cells[0].textContent,
+                        Status: 1,
+                        Step: document.getElementById("table_steps").rows[i].cells[2].querySelector('input').value,
+                        Expected_result: document.getElementById("table_steps").rows[i].cells[3].querySelector('input').value,
+                        Step_num: document.getElementById("table_steps").rows[i].cells[1].textContent
+                        //Step_num: i.toString()
+                    }
+
+                    var ur = "http://localhost:26228/api/TestCases/TestCase/" + ts.Test_case_id + "/TestSteps?username=kconners";
+                    alert(ur);
+                    alert(JSON.stringify(ts));
+                    $.ajax({
+                        url: ur,
+                        type: 'Put',
+                        data: JSON.stringify(ts),
+                        contentType: 'application/json',
+
+                        error: function (error) {
+                            alert(error.statusText);
+                            throw 'mYException';
+
+                        }
+                    });
+
+                }
+                catch (e) {
+                    alert(e.statusText);
+                }
+            }
+        }
+        LoadSteps(document.getElementById("tc_idNum").innerHTML);
+    };
     function UpdateTestCase() {
 
         var dc = $(document.getElementById('tc_idNum')).text();
-        
+
         var ur = "http://localhost:26228/api/TestCases?id=";
         $.ajax({
             url: ur + dc,
             type: 'GET',
 
             success: function (response) {
-                
+
                 var ss = JSON.parse(response);
                 var D = ss.testcases;
 
                 $.each(D, function (key, value) {
                     Fill(value);
                 })
-
-                
-                
             },
             error: function (error) {
                 alert(url);
@@ -328,161 +490,11 @@
             }
         });
 
-        
+
     };
-    function AddNewTestStep() {
-        var StepNUmber = document.getElementById('table_steps').rows.length;
-        
-        var ts = {
-            Test_case_id: document.getElementById("tc_idNum").innerHTML,
-            Id: '00000000-0000-0000-0000-000000000000',
-            Status: 1,
-            Step_num: StepNUmber,
-            Step: "",
-            Exprected_result: ""
-        }
-
-        var ur = "http://localhost:26228/api/TestCases/TestCase/" + ts.Test_case_id + "/TestSteps?username=kconners";
-
-        $.ajax({
-            url: ur,
-            type: 'Post',
-            data: JSON.stringify(ts),
-            contentType: 'application/json',
-
-
-            success: function (response) {
-              
-                LoadSteps(ts.Test_case_id);
-            },
-            error: function (error) {
-                alert(error.statusText);
-
-            }
-        });
+    function UpdateTestStep(e) {
+        var id = $(e).closest("tr").find('td:eq(0)').text();
+        alert(id);
+        //  window.location.href = "/TestLevels/LevelDetails?parentID=" + id;
     };
-    function LoadSteps(testCaseID) {
-        
-        var ur = "http://localhost:26228/api/TestCases/TestCase/" + testCaseID + "/TestSteps";
-        var table = document.getElementById("table_steps");
-
-        $("table.test_steps tbody tr td").remove();
-        $("table.test_steps tbody tr div").remove();
-
-        $.ajax({
-            url: ur,
-            type: 'GET',
-
-            success: function (response) {
-
-                var ss = JSON.parse(response);
-                var D = ss.teststeps;
-
-                $.each(D, function (key, value) {
-                    var row = table.insertRow();
-                    var cell1 = row.insertCell(0);
-                    var cell2 = row.insertCell(1);
-                    var cell3 = row.insertCell(2);
-                    var cell4 = row.insertCell(3);
-                    var cell5 = row.insertCell(4);
-                    cell1.outerHTML = '<tr style="width:1px"><td style="visibility:hidden; width:1px"><div style="visibility:hidden; width:1px;  max-height:25px">'+value.Id+'</div></td></tr>';
-                    cell2.innerHTML = key+1;
-                    cell3.outerHTML = '<tr><td><div><input style="width:440px" type="text" id="tb_step" value = \"' + value.Step + '"></div></td></tr>';
-                    cell4.outerHTML = '<tr><td><div><input style="width:440px" id = "tb_ER" type="text" value =\"' + value.Expected_result.toString() + '"></div></td></tr>';
-                    cell5.outerHTML = '<tr><td><div><input type="button" value="Edit" onclick="UpdateTestStep(this)"><input type="button" value="Delete" onclick="deleteTestStep(this)"></div></td></tr>'
-                })
-            },
-            error: function (error) {
-                alert(error.statusText);
-            }
-        });
-    };
-    function AddTestCase()
-    {
-        var testcase = {
-
-            test_case: document.getElementById("tb_testcase").value,
-            structure_idnum: document.getElementById("Structure_ID").innerHTML,
-            test_case_description: document.getElementById("tb_description").value,
-            test_condition: document.getElementById("tb_condition").value,
-            testtype: document.getElementById("tb_test_type").value,
-            use_case: document.getElementById("tb_use_case").value,
-            prd: document.getElementById("tb_prd").value,
-            requirement_id: document.getElementById("tb_requirement_id").value,
-            iteration: document.getElementById("tb_itereation").value,
-            module: document.getElementById("tb_module").value,
-            feature: document.getElementById("tb_feature").value,
-            feature_type: document.getElementById("tb_feature_type").value,
-            assigned_to: document.getElementById("tb_assigned_to").value,
-            notes: document.getElementById("tb_notes").value,
-            automated_yes_no: document.getElementById("tb_auto_y_n").value,
-            automation_script_name: document.getElementById("tb_auto_script_name").value,
-            regression_yes_no: document.getElementById("tb_regression_y_n").value
-           
-        }
-
-        var ur = "http://localhost:26228/api/TestCases/TestCase?username=kconners";
-
-        $.ajax({
-            url: ur,
-            type: 'Post',
-            data: JSON.stringify(testcase),
-            contentType: 'application/json',
-
-
-            success: function (response) {
-              //  alert(response);
-                Loaddetails(response);
-            },
-            error: function (error) {
-                alert(error.statusText);
-
-            }
-        });  
-    };
-    function Fill(tc) {
-            tc.test_case = document.getElementById("tb_testcase").value;
-            tc.test_case_description = document.getElementById("tb_description").value;
-            tc.test_condition = document.getElementById("tb_condition").value;
-
-            tc.testtype = document.getElementById("tb_test_type").value;
-            tc.use_case = document.getElementById("tb_use_case").value;
-
-            tc.prd = document.getElementById("tb_prd").value;
-            tc.requirement_id = document.getElementById("tb_requirement_id").value;
-
-            tc.iteration = document.getElementById("tb_itereation").value;
-            tc.module = document.getElementById("tb_module").value;
-
-            tc.feature = document.getElementById("tb_feature").value;
-            tc.feature_type = document.getElementById("tb_feature_type").value;
-
-            tc.assigned_to = document.getElementById("tb_assigned_to").value;
-            tc.notes = document.getElementById("tb_notes").value;
-
-            tc.automated_yes_no = document.getElementById("tb_auto_y_n").value;
-            tc.automation_test_status = 0;
-
-            tc.automation_script_name = document.getElementById("tb_auto_script_name").value;
-            tc.regression_yes_no = document.getElementById("tb_regression_y_n").value;
-        
-
-        var ur = "http://localhost:26228/api/TestCases/TestCase?username=kconners";
-        alert(JSON.stringify(tc));
-        $.ajax({
-            url: ur,
-            type: 'Put',
-            data: JSON.stringify(tc),
-            contentType: 'application/json',
-
-
-            success: function (response) {
-                alert(response);
-            },
-            error: function (error) {
-                alert(error.statusText);
-
-            }
-        });
-    };
-    </script>
+</script>
