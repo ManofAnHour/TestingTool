@@ -1,0 +1,54 @@
+-- FUNCTION: automation.maintain_run(uuid, uuid, integer, text, text, integer)
+
+-- DROP FUNCTION automation.maintain_run(uuid, uuid, integer, text, text, integer);
+
+CREATE OR REPLACE FUNCTION automation.maintain_run(
+	v_idnumber uuid,
+	v_testset_idnumber uuid,
+	v_id integer,
+	v_notes text,
+	q_username text,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+countr := (select count(*) from automation.runs where row_idnum = v_idnumber and testset_idnum = v_testset_idnumber);
+
+if (countr = 0)
+then
+begin
+
+v_id = (select max(id) +1 from automation.runs );
+
+INSERT INTO automation.runs(	row_idnum, 		id, 		testset_idnum, 		notes, 		created_by, 
+                            	create_date, 	updated_by, updated_date, 		status)
+					VALUES (	v_idnumber,		v_id, 		v_testset_idnumber,	v_notes, 	q_username,  
+            					getdate(),		q_username,	getdate(), 			v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+	UPDATE automation.runs
+	SET notes			= v_notes, 
+        updated_by		= q_username, 
+        updated_date	= getdate(),
+    	status 			= v_status
+where row_idnumber 		= v_idnumber;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION automation.maintain_run(uuid, uuid, integer, text, text, integer)
+    OWNER TO postgres;

@@ -1,0 +1,55 @@
+-- FUNCTION: qadata.maintain_level(uuid, uuid, character varying, character varying, character varying, integer)
+
+-- DROP FUNCTION qadata.maintain_level(uuid, uuid, character varying, character varying, character varying, integer);
+
+CREATE OR REPLACE FUNCTION qadata.maintain_level(
+	v_idnumber uuid,
+	v_parent_idnumber uuid,
+	v_name character varying,
+	v_shrtr_name character varying,
+	q_username character varying,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+countr := (select count(*) from qadata.ref_structure where row_idnumber = v_idnumber and parent_idnumber = v_parent_idnumber);
+
+if (countr = 0)
+then
+begin
+
+INSERT INTO qadata.ref_structure(	row_idnumber, 		parent_idnumber, 		name, 			srtname, 		created_by, 
+                                 	create_date, 		updated_by, 			updated_date, 	status)
+						 VALUES (	v_idnumber, 		v_parent_idnumber, 		v_name, 		v_shrtr_name,  	q_username,  
+            						getdate(), 			q_username, 			getdate(), 		v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+	update qadata.ref_structure
+	set parent_idnumber  	= v_parent_idnumber, 
+		name      			= v_name, 
+		srtname        		= v_shrtr_name, 
+		updated_by    		= q_username, 
+		updated_date    	= getdate(), 
+		status          	= v_status
+		
+where row_idnumber = v_idnumber;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION qadata.maintain_level(uuid, uuid, character varying, character varying, character varying, integer)
+    OWNER TO postgres;

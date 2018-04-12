@@ -1,0 +1,69 @@
+-- FUNCTION: qadata.maintain_testcase_step(uuid, uuid, character varying, character varying, integer, character varying, integer)
+
+-- DROP FUNCTION qadata.maintain_testcase_step(uuid, uuid, character varying, character varying, integer, character varying, integer);
+
+CREATE OR REPLACE FUNCTION qadata.maintain_testcase_step(
+	v_idnumber uuid,
+	v_test_idnum uuid,
+	v_step character varying,
+	v_expected_result character varying,
+	v_step_num integer,
+	q_username character varying,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+countr := (select count(*) from qadata.test_steps where row_idnum = v_idnumber);
+
+if (countr = 0)
+then
+begin
+
+INSERT INTO qadata.test_steps(row_idnum, 		test_idnum, 			step, 					     step_number, 		        expected_reult, 			     
+                              created_by,	 	create_date,      		updated_by, 				 updated_date, 				status)
+                                
+					  VALUES (v_idnumber, 		v_test_idnum,			v_step,	 		 			 v_step_num, 		        v_expected_result, 
+ 		 					  q_username,		getdate(), 			    q_username, 				 getdate(), 				v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+
+	if(v_status >= 0)
+    then
+    begin
+	UPDATE qadata.test_steps
+	SET step				    = v_step, 
+        expected_reult			= v_expected_result,
+        step_number				= v_step_num,
+        updated_by				= q_username,
+        updated_date			= getdate(),
+        status 					= v_status
+	
+		
+	where row_idnum = v_idnumber;
+    end;
+    elseif(v_status < 0)
+    then
+    begin
+    delete from qadata.test_steps where row_idnum = v_idnumber;
+    end;
+    end if;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION qadata.maintain_testcase_step(uuid, uuid, character varying, character varying, integer, character varying, integer)
+    OWNER TO postgres;

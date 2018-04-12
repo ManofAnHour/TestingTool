@@ -1,0 +1,25 @@
+-- Table: automation.run_item
+
+-- DROP TABLE automation.run_item;
+
+CREATE TABLE automation.run_item
+(
+    row_idnum uuid,
+    run_idnum uuid,
+    testset_idnum uuid,
+    test_idnum uuid,
+    item_number integer,
+    method_name text COLLATE "default".pg_catalog,
+    created_by character varying(255) COLLATE "default".pg_catalog,
+    create_date timestamp without time zone,
+    updated_by character varying(255) COLLATE "default".pg_catalog,
+    updated_date timestamp without time zone,
+    status integer
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE automation.run_item
+    OWNER to postgres;

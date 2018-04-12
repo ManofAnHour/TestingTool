@@ -1,0 +1,59 @@
+-- FUNCTION: automation.maintain_run_item(uuid, uuid, uuid, uuid, integer, text, text, integer)
+
+-- DROP FUNCTION automation.maintain_run_item(uuid, uuid, uuid, uuid, integer, text, text, integer);
+
+CREATE OR REPLACE FUNCTION automation.maintain_run_item(
+	v_idnumber uuid,
+	v_run_idnumber uuid,
+	v_testset_idnumber uuid,
+	v_test_idnumber uuid,
+	v_item_num integer,
+	v_method_name text,
+	q_username text,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+countr := (select count(*) from automation.run_item where run_idnum = v_run_idnumber and test_idnum = v_test_idnumber);
+
+if (countr = 0)
+then
+begin
+v_item_num := (select case when ((select count(*) from automation.run_item where  run_idnum = v_run_idnumber and testset_idnum = v_testset_idnumber) = 0) then (select 1)
+			                else (select max(item_number) +1 from automation.run_item where run_idnum = v_run_idnumber and testset_idnum = v_testset_idnumber) end);
+            
+            
+INSERT INTO automation.run_item(row_idnum, 		run_idnum, 		testset_idnum, 		test_idnum, 		item_number, 
+                                method_name, 	created_by, 	create_date, 		updated_by, 		updated_date, 
+                                status)
+						VALUES (v_idnumber, 	v_run_idnumber, v_testset_idnumber, v_test_idnumber, 	v_item_num, 
+                                v_method_name, 	q_username,		getdate(),		  	q_username,	        getdate(),		
+                                v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+	UPDATE automation.runnotes
+	SET updated_by		= q_username, 
+        updated_date	= getdate(),
+    	status 			= v_status
+where run_idnum 		= v_run_idnumber 
+  and test_idnum 		= v_test_idnumber;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION automation.maintain_run_item(uuid, uuid, uuid, uuid, integer, text, text, integer)
+    OWNER TO postgres;

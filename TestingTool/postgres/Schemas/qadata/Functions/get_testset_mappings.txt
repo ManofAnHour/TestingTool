@@ -1,0 +1,26 @@
+-- FUNCTION: qadata.get_testset_mappings(uuid)
+
+-- DROP FUNCTION qadata.get_testset_mappings(uuid);
+
+CREATE OR REPLACE FUNCTION qadata.get_testset_mappings(
+	v_testset_idnum uuid)
+    RETURNS SETOF "TABLE(testcase_idnumber uuid, testcase text, title text, checked integer)"
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+DECLARE   sql text := ('drop table if exists temp1; CREATE TEMP TABLE temp1 AS select row_idnum as "tc_idnumber", test_case as "test_case", test_case_title as "test_case_title", 1 as "checked" from qadata.testcasemain where status = 1 union select tcm.row_idnum as  "tc_idnumber", tcm.test_case as "test_case", test_case_title as "test_case_title" , 2 as "checked" from qadata.testset_case_mapping mapping join qadata.testcasemain tcm on mapping.test_idnum = tcm.row_idnum
+                       where mapping.status >= 1 and mapping.row_idnum = $1;');
+                       Begin
+EXECUTE sql
+USING v_testset_idnum;
+ sql := ( 'select tc_idnumber,test_case,test_case_title, max(checked) from temp1 group by tc_idnumber,test_case,test_case_title;');
+RETURN QUERY EXECUTE sql;
+
+END;
+
+$function$;
+
+ALTER FUNCTION qadata.get_testset_mappings(uuid)
+    OWNER TO postgres;

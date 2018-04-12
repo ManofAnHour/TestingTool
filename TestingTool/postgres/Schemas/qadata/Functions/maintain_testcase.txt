@@ -1,0 +1,127 @@
+-- FUNCTION: qadata.maintain_testcase(uuid, uuid, uuid, uuid, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, uuid, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer, character varying, timestamp without time zone, character varying, integer, uuid, uuid, uuid, uuid, uuid, integer, character varying, integer)
+
+-- DROP FUNCTION qadata.maintain_testcase(uuid, uuid, uuid, uuid, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, uuid, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer, character varying, timestamp without time zone, character varying, integer, uuid, uuid, uuid, uuid, uuid, integer, character varying, integer);
+
+CREATE OR REPLACE FUNCTION qadata.maintain_testcase(
+	v_idnumber uuid,
+	v_client_idnum uuid,
+	v_structure_idnum uuid,
+	v_br_idnum uuid,
+	v_testtype character varying,
+	v_iteration character varying,
+	v_prd character varying,
+	v_requirement_id character varying,
+	v_use_case character varying,
+	v_test_case character varying,
+	v_test_case_title character varying,
+	v_test_case_description character varying,
+	v_module character varying,
+	v_feature character varying,
+	v_feature_idnumber uuid,
+	v_feature_type character varying,
+	v_test_case_id character varying,
+	v_test_condition character varying,
+	v_assigned_to character varying,
+	v_notes character varying,
+	v_automated_yes_no character varying,
+	v_automation_script_name character varying,
+	v_automation_test_status integer,
+	v_regression_yes_no character varying,
+	v_aproveddate timestamp without time zone,
+	v_aprovedby character varying,
+	v_testcasenum integer,
+	v_rorv_idnum uuid,
+	v_ticket_mapping_idnum uuid,
+	v_automation_test_idnum uuid,
+	v_standard_test_idnum uuid,
+	v_qa_test_idnum uuid,
+	v_qatestcasenum integer,
+	q_username character varying,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+v_test_case_title := (select qadata.get_structure_path(v_structure_idnum) || '> ' ||(SELECT substring(v_test_case from 0 for 95)));
+
+countr := (select count(*) from qadata.testcasemain where row_idnum = v_idnumber);
+
+if (countr = 0)
+then
+begin
+
+INSERT INTO qadata.testcasemain(row_idnum, 					 client_idnum, 				structure_idnum, 		 br_idnum, 					testtype, 
+                                iteration, 					 prd, 						requirement_id, 		 use_case, 					test_case, 
+                                test_case_title, 			 test_case_description,		module, 				 feature, 					feature_idnumber, 
+                                feature_type, 				 test_case_id, 				test_condition, 		 assigned_to, 				notes, 
+                                automated_yes_no, 			 automation_script_name, 	automation_test_status,  regression_yes_no, 		aproveddate, 
+                                aprovedby, 					 testcasenum, 				rorv_idnum, 			 ticket_mapping_idnum, 		automation_test_idnum, 
+                                standard_test_idnum, 		 qa_test_idnum, 			qatestcasenum, 			 created_by, 				create_date, 
+                                updated_by, 				 updated_date, 				status)
+                                
+						VALUES (v_idnumber, 				 v_client_idnum, 			v_structure_idnum, 		 v_br_idnum, 				v_testtype, 
+                                v_iteration, 				 v_prd, 					v_requirement_id, 		 v_use_case, 				v_test_case, 
+                                v_test_case_title, 			 v_test_case_description, 	v_module, 				 v_feature, 	 			v_feature_idnumber, 		
+                                v_feature_type,              v_test_case_id, 			v_test_condition, 		 v_assigned_to, 			v_notes, 					
+                                v_automated_yes_no,          v_automation_script_name,  v_automation_test_status,v_regression_yes_no, 	 	v_aproveddate, 			
+                                v_aprovedby,                 v_testcasenum,				v_rorv_idnum, 			 v_ticket_mapping_idnum,    v_automation_test_idnum, 	
+                                v_standard_test_idnum,       v_qa_test_idnum,           v_qatestcasenum, 		 q_username,  				getdate(), 			
+                                q_username, 				 getdate(), 				v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+	UPDATE qadata.testcasemain
+	SET br_idnum				= v_br_idnum, 
+        testtype				= v_testtype,
+        iteration				= v_iteration,
+        prd						= v_prd,
+        requirement_id			= v_requirement_id,
+        use_case				= v_use_case,
+        test_case				= v_test_case,
+        test_case_title			= v_test_case_title,
+        test_case_description	= v_test_case_description,
+        module            		= v_module,
+        feature           		= v_feature,
+        feature_idnumber  	   	= v_feature_idnumber,
+        feature_type           	= v_feature_type,
+        test_case_id           	= v_test_case_id,
+        test_condition         	= v_test_condition,
+        assigned_to            	= v_assigned_to,
+        notes                  	= v_notes,
+        automated_yes_no       	= v_automated_yes_no,
+        automation_script_name 	= v_automation_script_name,
+        automation_test_status 	= v_automation_test_status,
+        regression_yes_no		= v_regression_yes_no,
+        aproveddate				= v_aproveddate,
+        aprovedby				= v_aprovedby,
+        testcasenum				= v_testcasenum,
+        rorv_idnum				= v_rorv_idnum,
+        ticket_mapping_idnum	= v_ticket_mapping_idnum,
+        automation_test_idnum	= v_automation_test_idnum,
+        standard_test_idnum		= v_standard_test_idnum,
+        qa_test_idnum			= v_qa_test_idnum,
+        qatestcasenum			= v_qatestcasenum,
+        updated_by				= q_username,
+        updated_date			= getdate(),
+        status 					= v_status
+	
+		
+	where row_idnum = v_idnumber;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION qadata.maintain_testcase(uuid, uuid, uuid, uuid, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, uuid, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer, character varying, timestamp without time zone, character varying, integer, uuid, uuid, uuid, uuid, uuid, integer, character varying, integer)
+    OWNER TO postgres;

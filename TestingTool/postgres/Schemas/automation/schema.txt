@@ -1,0 +1,6 @@
+﻿-- SCHEMA: automation
+
+-- DROP SCHEMA automation ;
+
+CREATE SCHEMA automation
+    AUTHORIZATION postgres;

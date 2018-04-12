@@ -1,0 +1,23 @@
+-- Table: qadata.ref_structure
+
+-- DROP TABLE qadata.ref_structure;
+
+CREATE TABLE qadata.ref_structure
+(
+    row_idnumber uuid,
+    parent_idnumber uuid,
+    name character varying(255) COLLATE "default".pg_catalog,
+    srtname character varying(255) COLLATE "default".pg_catalog,
+    created_by character varying(255) COLLATE "default".pg_catalog,
+    create_date timestamp without time zone,
+    updated_by character varying(255) COLLATE "default".pg_catalog,
+    updated_date timestamp without time zone,
+    status integer
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE qadata.ref_structure
+    OWNER to postgres;

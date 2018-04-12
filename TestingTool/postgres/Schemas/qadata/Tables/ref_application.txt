@@ -1,0 +1,22 @@
+﻿-- Table: qadata.ref_application
+
+-- DROP TABLE qadata.ref_application;
+
+CREATE TABLE qadata.ref_application
+(
+    row_idnumber uuid,
+    application character varying(255) COLLATE "default".pg_catalog,
+    app_srtname character varying(255) COLLATE "default".pg_catalog,
+    created_by character varying(255) COLLATE "default".pg_catalog,
+    create_date timestamp without time zone,
+    updated_by character varying(255) COLLATE "default".pg_catalog,
+    updated_date timestamp without time zone,
+    status integer
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE qadata.ref_application
+    OWNER to postgres;

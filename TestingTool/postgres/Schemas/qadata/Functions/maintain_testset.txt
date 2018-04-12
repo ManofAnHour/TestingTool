@@ -1,0 +1,56 @@
+-- FUNCTION: qadata.maintain_testset(uuid, character varying, text, integer, character varying, integer)
+
+-- DROP FUNCTION qadata.maintain_testset(uuid, character varying, text, integer, character varying, integer);
+
+CREATE OR REPLACE FUNCTION qadata.maintain_testset(
+	v_idnumber uuid,
+	v_testset_title character varying,
+	v_testset_description text,
+	v_testset_id integer,
+	q_username character varying,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+countr := (select count(*) from qadata.ref_testset where row_idnumber = v_idnumber);
+
+if (countr = 0)
+then
+begin
+
+INSERT INTO qadata.ref_testset(	row_idnumber, 	testset_title, 		testset_description, 	testset_id,    	  created_by, 	
+                                create_date, 	updated_by, 		updated_date, 			status)
+					   VALUES ( v_idnumber,  	v_testset_title, 	v_testset_description, 	v_testset_id,     q_username,		
+                                getdate(), 	    q_username, 	    getdate(), 				v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+	UPDATE qadata.ref_testset
+	SET testset_title			= v_testset_title, 
+    	testset_description		= v_testset_description, 
+        testset_id				= v_testset_id,
+        updated_by				= q_username,
+        updated_date			= getdate(),
+        status 					= v_status
+	
+		
+	where row_idnum = v_idnumber;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION qadata.maintain_testset(uuid, character varying, text, integer, character varying, integer)
+    OWNER TO postgres;

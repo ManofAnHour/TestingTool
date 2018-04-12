@@ -1,0 +1,52 @@
+-- Table: qadata.testcasemain
+
+-- DROP TABLE qadata.testcasemain;
+
+CREATE TABLE qadata.testcasemain
+(
+    row_idnum uuid,
+    client_idnum uuid,
+    structure_idnum uuid,
+    br_idnum uuid,
+    testtype text COLLATE "default".pg_catalog,
+    iteration text COLLATE "default".pg_catalog,
+    prd text COLLATE "default".pg_catalog,
+    requirement_id text COLLATE "default".pg_catalog,
+    use_case text COLLATE "default".pg_catalog,
+    test_case text COLLATE "default".pg_catalog,
+    test_case_title text COLLATE "default".pg_catalog,
+    test_case_description text COLLATE "default".pg_catalog,
+    module text COLLATE "default".pg_catalog,
+    feature text COLLATE "default".pg_catalog,
+    feature_idnumber uuid,
+    feature_type text COLLATE "default".pg_catalog,
+    test_case_id text COLLATE "default".pg_catalog,
+    test_condition text COLLATE "default".pg_catalog,
+    assigned_to text COLLATE "default".pg_catalog,
+    notes text COLLATE "default".pg_catalog,
+    automated_yes_no text COLLATE "default".pg_catalog,
+    automation_script_name text COLLATE "default".pg_catalog,
+    automation_test_status integer,
+    regression_yes_no text COLLATE "default".pg_catalog,
+    aproveddate timestamp without time zone,
+    aprovedby character varying(255) COLLATE "default".pg_catalog,
+    testcasenum integer,
+    rorv_idnum uuid,
+    ticket_mapping_idnum uuid,
+    automation_test_idnum uuid,
+    standard_test_idnum uuid,
+    qa_test_idnum uuid,
+    qatestcasenum integer,
+    created_by character varying(255) COLLATE "default".pg_catalog,
+    create_date timestamp without time zone,
+    updated_by character varying(255) COLLATE "default".pg_catalog,
+    updated_date timestamp without time zone,
+    status integer
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE qadata.testcasemain
+    OWNER to postgres;

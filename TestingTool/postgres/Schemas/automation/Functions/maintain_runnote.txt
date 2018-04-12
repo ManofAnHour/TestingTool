@@ -1,0 +1,60 @@
+-- FUNCTION: automation.maintain_runnote(uuid, uuid, uuid, uuid, integer, text, text, text, integer)
+
+-- DROP FUNCTION automation.maintain_runnote(uuid, uuid, uuid, uuid, integer, text, text, text, integer);
+
+CREATE OR REPLACE FUNCTION automation.maintain_runnote(
+	v_idnumber uuid,
+	v_run_idnumber uuid,
+	v_testset_idnumber uuid,
+	v_test_idnumber uuid,
+	v_id integer,
+	v_method_name text,
+	v_notes text,
+	q_username text,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+countr := (select count(*) from automation.runnotes where row_idnum = v_idnumber and run_idnum = v_run_idnumber);
+
+if (countr = 0)
+then
+begin
+v_id := (select case when ((select count(*) from automation.runnotes where  run_idnum = v_run_idnumber and test_idnum = v_test_idnumber) = 0) then (select 1)
+			else (select max(id) +1 from automation.runnotes where run_idnum = v_run_idnumber and test_idnum = v_test_idnumber) end);
+
+INSERT INTO automation.runnotes(row_idnum, 		run_idnum, 		testset_idnum, 			test_idnum, 	  id, 
+                                method_name, 	notes, 			created_by, 			create_date, 	  updated_by, 
+                                updated_date, 	status)
+						VALUES (v_idnumber, 	v_run_idnumber, v_testset_idnumber, 	v_test_idnumber,  v_id, 
+                                v_method_name, 	v_notes,		q_username,  			getdate(),		  q_username,	
+                                getdate(),		v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+	UPDATE automation.runnotes
+	SET notes			= v_notes,
+        updated_by		= q_username, 
+        updated_date	= getdate(),
+    	status 			= v_status
+where row_idnum 		= v_idnumber 
+  and run_idnum 		= v_run_idnumber;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION automation.maintain_runnote(uuid, uuid, uuid, uuid, integer, text, text, text, integer)
+    OWNER TO postgres;

@@ -1,0 +1,18 @@
+-- FUNCTION: public.getdate()
+
+-- DROP FUNCTION public.getdate();
+
+CREATE OR REPLACE FUNCTION public.getdate(
+	)
+    RETURNS timestamp with time zone
+    LANGUAGE 'sql'
+    COST 100.0
+
+AS $function$
+
+select now()
+
+$function$;
+
+ALTER FUNCTION public.getdate()
+    OWNER TO postgres;

@@ -1,0 +1,23 @@
+-- Table: qadata.testset_case_mapping
+
+-- DROP TABLE qadata.testset_case_mapping;
+
+CREATE TABLE qadata.testset_case_mapping
+(
+    row_idnum uuid,
+    test_idnum uuid,
+    testset_idnum uuid,
+    order_number integer,
+    created_by character varying(255) COLLATE "default".pg_catalog,
+    create_date timestamp without time zone,
+    updated_by character varying(255) COLLATE "default".pg_catalog,
+    updated_date timestamp without time zone,
+    status integer
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE qadata.testset_case_mapping
+    OWNER to postgres;

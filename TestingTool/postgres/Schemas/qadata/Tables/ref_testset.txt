@@ -1,0 +1,23 @@
+-- Table: qadata.ref_testset
+
+-- DROP TABLE qadata.ref_testset;
+
+CREATE TABLE qadata.ref_testset
+(
+    row_idnumber uuid,
+    testset_title character varying(255) COLLATE "default".pg_catalog,
+    testset_description text COLLATE "default".pg_catalog,
+    testset_id integer,
+    created_by character varying(255) COLLATE "default".pg_catalog,
+    create_date timestamp without time zone,
+    updated_by character varying(255) COLLATE "default".pg_catalog,
+    updated_date timestamp without time zone,
+    status integer
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE qadata.ref_testset
+    OWNER to postgres;

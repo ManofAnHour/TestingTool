@@ -1,0 +1,24 @@
+-- Table: qadata.test_steps
+
+-- DROP TABLE qadata.test_steps;
+
+CREATE TABLE qadata.test_steps
+(
+    row_idnum uuid,
+    test_idnum uuid,
+    step text COLLATE "default".pg_catalog,
+    step_number integer,
+    expected_reult text COLLATE "default".pg_catalog,
+    created_by character varying(255) COLLATE "default".pg_catalog,
+    create_date timestamp without time zone,
+    updated_by character varying(255) COLLATE "default".pg_catalog,
+    updated_date timestamp without time zone,
+    status integer
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE qadata.test_steps
+    OWNER to postgres;

@@ -1,0 +1,6 @@
+﻿-- SCHEMA: qadata
+
+-- DROP SCHEMA qadata ;
+
+CREATE SCHEMA qadata
+    AUTHORIZATION postgres;

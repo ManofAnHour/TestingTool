@@ -1,0 +1,77 @@
+-- FUNCTION: qadata.get_structure_path(uuid)
+
+-- DROP FUNCTION qadata.get_structure_path(uuid);
+
+CREATE OR REPLACE FUNCTION qadata.get_structure_path(
+	v_structure_idnumber uuid)
+    RETURNS text
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+declare structure_path text;
+declare start integer;
+declare parentID uuid;
+declare recordID uuid;
+
+begin
+
+ countr := (select count(*) from qadata.ref_structure where parent_idnumber != '00000000-0000-0000-0000-000000000000' and row_idnumber = v_structure_idnumber);
+
+if(countr = 0)
+then
+begin
+
+structure_path := (select srtname from qadata.ref_structure where row_idnumber = v_structure_idnumber);
+
+end;
+elseif(countr >= 1)
+then
+begin
+recordID := v_structure_idnumber;
+structure_path := '>'||(select srtname from qadata.ref_structure where row_idnumber = v_structure_idnumber);
+
+start := 0;
+while(start < 1) loop
+
+parentID := (select parent_idnumber from qadata.ref_structure where row_idnumber = recordID);
+if(parentID = '00000000-0000-0000-0000-000000000000')
+then 
+begin
+
+--structure_path := (select srtname from qadata.ref_structure where row_idnumber = recordID) || structure_path;
+
+start :=1;
+end;
+
+elseif(parentID != '00000000-0000-0000-0000-000000000000')
+
+then 
+begin
+recordid := parentID;
+structure_path := '>'||(select srtname from qadata.ref_structure where row_idnumber = recordID) || structure_path;
+
+end;
+end if;
+
+end loop;
+
+end;
+end if;
+
+if(select left(structure_path, 1) ='>')
+then
+begin
+structure_path = (SELECT substring(structure_path from 2));
+end;
+end if;
+
+return structure_path;
+end;
+
+$function$;
+
+ALTER FUNCTION qadata.get_structure_path(uuid)
+    OWNER TO postgres;

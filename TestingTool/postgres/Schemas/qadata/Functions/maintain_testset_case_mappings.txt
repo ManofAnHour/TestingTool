@@ -1,0 +1,56 @@
+-- FUNCTION: qadata.maintain_testset_case_mapping(uuid, uuid, uuid, integer, character varying, integer)
+
+-- DROP FUNCTION qadata.maintain_testset_case_mapping(uuid, uuid, uuid, integer, character varying, integer);
+
+CREATE OR REPLACE FUNCTION qadata.maintain_testset_case_mapping(
+	v_idnumber uuid,
+	v_testset_idnum uuid,
+	v_test_idnum uuid,
+	v_order_num integer,
+	q_username character varying,
+	v_status integer)
+    RETURNS uuid
+    LANGUAGE 'plpgsql'
+    COST 100.0
+
+AS $function$
+
+declare countr int;
+
+begin
+
+countr := (SELECT count(*) FROM qadata.testset_case_mapping where test_idnum = v_test_idnum and testset_idnum = v_testset_idnum);
+
+if (countr = 0)
+then
+begin
+
+INSERT INTO qadata.testset_case_mapping(row_idnum, 		test_idnum, 		testset_idnum, 		order_number, 		created_by, 
+                                        create_date, 	updated_by, 		updated_date, 		status)
+								VALUES (v_idnumber, 	v_test_idnum, 		v_testset_idnum, 	v_order_num,        q_username,		
+                                        getdate(),	    q_username,			getdate(),			v_status);
+end; 
+
+elseif(countr = 1)
+then 
+begin
+
+    v_idnumber := (select row_idnum from qadata.testset_case_mapping where test_idnum = v_test_idnum and testset_idnum = v_testset_idnum);
+
+	UPDATE qadata.testset_case_mapping
+	SET    order_number  = v_order_num, 
+           updated_by    = q_username, 
+           updated_date  = getdate(), 
+           status	     = v_status
+           
+	where  row_idnum = v_idnumber;
+end;
+end if;
+
+return v_idnumber;
+end;
+
+$function$;
+
+ALTER FUNCTION qadata.maintain_testset_case_mapping(uuid, uuid, uuid, integer, character varying, integer)
+    OWNER TO postgres;
